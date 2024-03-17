@@ -1,0 +1,5 @@
+http:
+  addr: "8081"
+  readTimeout: 10
+  writeTimeout: 10
+  maxHeaderBytes: 1048576
