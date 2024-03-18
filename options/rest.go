@@ -1,21 +1,22 @@
 /*
- * @Description:
  * @Author: yujiajie
- * @Date: 2023-11-26 15:10:54
- * @LastEditTime: 2023-12-10 23:44:43
+ * @Date: 2024-03-18 10:39:13
  * @LastEditors: yujiajie
+ * @LastEditTime: 2024-03-18 14:58:17
+ * @FilePath: /gateway/options/rest.go
+ * @Description:
  */
-package rest
+package options
 
 import "time"
 
 type MiddlewaresConf struct {
+	Auth       bool `json:",default=true"`
 	Trace      bool `json:",default=true"`
 	Log        bool `json:",default=true"`
 	Prometheus bool `json:",default=true"`
 	Breaker    bool `json:",default=true"`
 	Shedding   bool `json:",default=true"`
-	Timeout    bool `json:",default=true"`
 	Recover    bool `json:",default=true"`
 	Metrics    bool `json:",default=true"`
 	Gunzip     bool `json:",default=true"`

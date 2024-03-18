@@ -1,5 +1,32 @@
-http:
-  addr: "8081"
-  readTimeout: 10
-  writeTimeout: 10
-  maxHeaderBytes: 1048576
+gateway:
+  proxys:
+    - name: "modadmin"
+      endpoints:
+        - "http://192.168.2.118:8201"
+    - name: "tvadmin"
+      endpoints:
+        - "http://192.168.2.118:99"
+  restConf:
+    addr: "127.0.0.1:8081"
+    timeout: 30
+    maxBytes: 1048576
+    middlewares:
+      auth: false
+      trace: false
+      log: true
+      prometheus: false
+      breaker: false
+      shedding: false
+      recover: true
+      metrics: false
+      gunzip: false
+logger:
+  logLevel: debug
+  logPath: "../error/error.log"
+  maxSize: 128
+  maxAge: 7
+  maxBackups: 30
+  compress: false
+auth:
+  secret: "B63F477D-BBA3-4E52-96D3-C0034C27694A"
+  prevSecret: ""

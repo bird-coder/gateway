@@ -2,16 +2,23 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2024-03-17 14:07:26
- * @LastEditTime: 2024-03-17 14:09:39
+ * @LastEditTime: 2024-03-18 15:05:29
  * @LastEditors: yujiajie
  */
 package options
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
+
+var (
+	App = new(AppConfig)
+)
 
 type AppConfig struct {
-	Http   *HttpConfig
-	Logger *LoggerConfig
+	Logger  *LoggerConfig
+	Gateway *GatewayConf
+	Auth    *AuthConfig
 }
 
 func (app *AppConfig) LoadConfig(configFile string) (err error) {

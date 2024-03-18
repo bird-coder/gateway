@@ -1,8 +1,8 @@
 package logger
 
 import (
-	"encoding/json"
 	"fmt"
+	"gateway/core/constant"
 	"gateway/options"
 	"io"
 	"os"
@@ -15,20 +15,6 @@ var (
 	logger Logger
 )
 
-const (
-	Dev  = "dev"
-	Prod = "prod"
-)
-
-type LoggerConfig struct {
-	LogLevel   string `json:"level"`
-	LogPath    string `json:"logpath"`
-	MaxSize    int    `json:"maxsize"`
-	MaxAge     int    `json:"age"`
-	MaxBackups int    `json:"backups"`
-	Compress   string `json:"compress"`
-}
-
 type zaplog struct {
 	zap *zap.Logger
 	al  *zap.AtomicLevel
@@ -40,7 +26,7 @@ func NewLogger(cfg *options.LoggerConfig, env string) Logger {
 	level := toZapLevel(Level(cfg.LogLevel))
 
 	var zapOptions []zap.Option
-	if env == Dev {
+	if env == constant.Dev.String() {
 		writer = os.Stdout
 		zapOptions = append(zapOptions, zap.Development())
 	} else {
@@ -50,6 +36,7 @@ func NewLogger(cfg *options.LoggerConfig, env string) Logger {
 		zap.AddCallerSkip(1), zap.AddStacktrace(zap.WarnLevel))
 
 	zl := New(writer, level, zapOptions...)
+	logger = zl
 	return zl
 }
 
@@ -84,50 +71,22 @@ func toZapLevel(level Level) zapcore.Level {
 	switch level {
 	case DebugLevel:
 		logLevel = zap.DebugLevel
-		break
 	case InfoLevel:
 		logLevel = zap.InfoLevel
-		break
 	case WarnLevel:
 		logLevel = zap.WarnLevel
-		break
 	case ErrorLevel:
 		logLevel = zap.ErrorLevel
-		break
 	case PanicLevel:
 		logLevel = zap.PanicLevel
-		break
 	case DPanicLevel:
 		logLevel = zap.DPanicLevel
-		break
 	case FatalLevel:
 		logLevel = zap.FatalLevel
-		break
 	default:
 		logLevel = zap.InfoLevel
-		break
 	}
 	return logLevel
-}
-
-func formatConfig(configMap map[string]interface{}) *LoggerConfig {
-	data, err := json.Marshal(configMap)
-	if err != nil {
-		fmt.Fprint(os.Stderr, "load logger config error, error: json marshal failed\n")
-		os.Exit(1)
-	}
-	config := &LoggerConfig{
-		LogLevel:   "debug",
-		MaxSize:    128,
-		MaxAge:     7,
-		MaxBackups: 30,
-		Compress:   "false",
-	}
-	if err := json.Unmarshal(data, config); err != nil {
-		fmt.Fprintf(os.Stderr, "load logger config error, error: json unmarshal failed, data: %s\n", string(data))
-		os.Exit(1)
-	}
-	return config
 }
 
 func (zl *zaplog) Log(level Level, format string, args ...interface{}) {
