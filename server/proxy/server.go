@@ -2,29 +2,38 @@
  * @Author: yujiajie
  * @Date: 2024-03-18 15:35:38
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-18 16:15:37
+ * @LastEditTime: 2024-03-21 15:59:37
  * @FilePath: /gateway/server/proxy/server.go
  * @Description:
  */
 package proxy
 
 import (
+	"bytes"
+	"compress/gzip"
+	"fmt"
 	"gateway/options"
+	"gateway/server/rest/header"
+	"io"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"regexp"
+	"strconv"
+	"strings"
 )
 
 var (
 	filterHeaders = []string{
 		"Trailer", "Upgrade", "Proxy-Authorization", "Proxy-Authenticate",
+		"Accept-Encoding",
 	}
 )
 
 func NewServer(p options.Proxy) *httputil.ReverseProxy {
 	return &httputil.ReverseProxy{
-		Director: director(p),
+		Director:       director(p),
+		ModifyResponse: modifyResponse(),
 	}
 }
 
@@ -55,8 +64,36 @@ func director(p options.Proxy) func(*http.Request) {
 
 		filterHeader(r)
 		r.Header.Set("X-Forwarded-Host", r.Host)
+		r.Header.Set("X-Forwarded-For", target.Host)
 		r.Header.Set("X-Forwarded-Proto", r.URL.Scheme)
+		r.Header.Set("Accept", header.ApplicationJson)
 		r.Host = target.Host
+	}
+}
+
+func modifyResponse() func(*http.Response) error {
+	return func(res *http.Response) error {
+		if strings.Contains(res.Header.Get(header.ContentEncoding), header.GzipEncoding) && res.Body != nil {
+			reader, err := gzip.NewReader(res.Body)
+			if err != nil {
+				return err
+			}
+			defer reader.Close()
+
+			content, err := io.ReadAll(reader)
+			if err != nil {
+				return err
+			}
+			fmt.Println(string(content))
+
+			res.Body = io.NopCloser(bytes.NewBuffer(content))
+
+			res.Header.Del(header.ContentEncoding)
+			res.Header.Del(header.ContentLength)
+			res.Header.Set(header.ContentLength, strconv.Itoa(len(content)))
+		}
+
+		return nil
 	}
 }
 

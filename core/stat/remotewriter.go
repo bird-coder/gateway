@@ -2,7 +2,7 @@
  * @Author: yujiajie
  * @Date: 2024-03-18 17:43:23
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-18 17:46:58
+ * @LastEditTime: 2024-03-21 14:38:21
  * @FilePath: /gateway/core/stat/remotewriter.go
  * @Description:
  */
@@ -13,11 +13,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gateway/server/rest/header"
 	"net/http"
 	"time"
 )
-
-const jsonContentType = "application/json; charset=utf-8"
 
 var ErrWriteFailed = errors.New("submit failed")
 
@@ -39,7 +38,7 @@ func (rw *RemoteWriter) Write(report *StatReport) error {
 	client := &http.Client{
 		Timeout: 5 * time.Second,
 	}
-	resp, err := client.Post(rw.endpoint, jsonContentType, bytes.NewReader(bs))
+	resp, err := client.Post(rw.endpoint, header.JsonContentType, bytes.NewReader(bs))
 	if err != nil {
 		return err
 	}

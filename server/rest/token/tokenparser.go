@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-12-06 23:01:16
- * @LastEditTime: 2023-12-07 23:14:37
+ * @LastEditTime: 2024-03-22 09:23:35
  * @LastEditors: yujiajie
  */
 package token
@@ -18,6 +18,8 @@ import (
 )
 
 const claimHistoryResetDuration = time.Hour * 24
+
+type ParseOption func(parser *TokenParser)
 
 type TokenParser struct {
 	resetTime     time.Time
@@ -101,6 +103,8 @@ func (tp *TokenParser) loadCount(secret string) uint64 {
 	return 0
 }
 
-func WithResetDuration(duration time.Duration) {
-
+func WithResetDuration(duration time.Duration) ParseOption {
+	return func(parser *TokenParser) {
+		parser.resetDuration = duration
+	}
 }

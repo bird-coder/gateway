@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-19 20:28:11
- * @LastEditTime: 2024-03-18 11:57:54
+ * @LastEditTime: 2024-03-22 10:47:19
  * @LastEditors: yujiajie
  */
 package rest
@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"gateway/options"
 	"gateway/server/rest/middleware"
+	"gateway/server/rest/router"
 	"net/http"
 	"time"
 
@@ -28,6 +29,7 @@ type Server struct {
 func NewServer(c options.RestConf) *Server {
 	g := gin.New()
 	middleware.Init(g)
+	router.Init(g)
 	s := &http.Server{
 		Addr:           c.Addr,
 		Handler:        g,
@@ -47,12 +49,22 @@ func (s *Server) WithContext(ctx context.Context) {
 }
 
 func (s *Server) Start() error {
-	if err := s.ListenAndServe(); err != nil {
-		if err == http.ErrServerClosed {
-			fmt.Println("waiting for rest server finish...")
+	if len(s.cfg.CertFile) == 0 || len(s.cfg.KeyFile) == 0 {
+		if err := s.ListenAndServe(); err != nil {
+			if err == http.ErrServerClosed {
+				fmt.Println("waiting for rest server finish...")
+			}
+			return err
 		}
-		return err
+	} else {
+		if err := s.ListenAndServeTLS(s.cfg.CertFile, s.cfg.KeyFile); err != nil {
+			if err == http.ErrServerClosed {
+				fmt.Println("waiting for rest server finish...")
+			}
+			return err
+		}
 	}
+
 	return nil
 }
 
@@ -67,5 +79,9 @@ func (s *Server) Stop() error {
 
 func (s *Server) AddRoute(route Route) {
 	g := s.Handler.(*gin.Engine)
-	g.Any(route.Path, route.Handler)
+	group := g.Group(route.Group)
+	group.Use(route.Middleware...)
+	{
+		group.Any(route.Path, route.Handler)
+	}
 }

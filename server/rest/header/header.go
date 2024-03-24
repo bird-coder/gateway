@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-12-10 21:08:41
- * @LastEditTime: 2023-12-10 22:13:15
+ * @LastEditTime: 2024-03-22 18:10:16
  * @LastEditors: yujiajie
  */
 package header
@@ -30,6 +30,7 @@ const (
 
 const (
 	ContentEncoding  = "Content-Encoding"
+	ContentLength    = "Content-Length"
 	ContentSecurity  = "X-Content-Security"
 	RequestUriHeader = "X-Request-Uri"
 	ApplicationJson  = "application/json"
@@ -41,6 +42,8 @@ const (
 	SignatureField   = "signature"
 	TimeField        = "time"
 	CryptionType     = 1
+	GzipEncoding     = "gzip"
+	AppIdField       = "appid"
 )
 
 const (

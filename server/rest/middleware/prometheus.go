@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-29 23:56:37
- * @LastEditTime: 2023-12-05 23:23:55
+ * @LastEditTime: 2024-03-22 18:15:11
  * @LastEditors: yujiajie
  */
 package middleware
@@ -36,8 +36,10 @@ var (
 	})
 )
 
-func PrometheusHandler(path, method string) gin.HandlerFunc {
+func PrometheusHandler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		path := ctx.Request.URL.Path
+		method := ctx.Request.Method
 		startTime := time.Now()
 		defer func() {
 			metricServerReqDur.Observe(time.Since(startTime).Milliseconds(), path, method)
@@ -46,13 +48,3 @@ func PrometheusHandler(path, method string) gin.HandlerFunc {
 		ctx.Next()
 	}
 }
-
-// func MetricHandle() gin.HandlerFunc {
-// 	return func(ctx *gin.Context) {
-// 		startTime := time.Now()
-// 		defer func ()  {
-
-// 		}()
-// 		ctx.Next()
-// 	}
-// }

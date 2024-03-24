@@ -2,15 +2,17 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-26 17:55:56
- * @LastEditTime: 2024-03-18 17:55:45
+ * @LastEditTime: 2024-03-22 11:49:38
  * @LastEditors: yujiajie
  */
 package middleware
 
 import (
 	"gateway/core/stat"
+	"gateway/core/trace"
 	"gateway/options"
 
+	"github.com/alibaba/sentinel-golang/api"
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 
@@ -22,32 +24,30 @@ func Init(r *gin.Engine) {
 	r.Use(NoCache)
 	r.Use(Options)
 	r.Use(Secure)
-	if middlewareConfig.Auth {
-		handler := Authorize(options.App.Auth.Secret, WithPrevSecret(options.App.Auth.PrevSecret))
-		r.Use(handler)
+	if middlewareConfig.Gunzip {
+		r.Use(gzip.Gzip(gzip.DefaultCompression))
+	}
+	if middlewareConfig.Recover {
+		r.Use(RecoverHandler())
 	}
 	if middlewareConfig.Trace {
-		r.Use(otelgin.Middleware("my-server"))
+		trace.NewOsExporter(trace.DefaultService)
+		r.Use(otelgin.Middleware(trace.DefaultService))
 	}
 	if middlewareConfig.Log {
 		r.Use(LogHandler())
 	}
 	if middlewareConfig.Prometheus {
-
+		r.Use(PrometheusHandler())
 	}
-	if middlewareConfig.Breaker {
-		r.Use(Sentinel())
-	}
-	if middlewareConfig.Shedding {
-
-	}
-	if middlewareConfig.Recover {
-		r.Use(RecoverHandler())
-	}
+	api.InitWithConfigFile("config/sentinel.yaml")
+	r.Use(Sentinel())
 	if middlewareConfig.Metrics {
 		r.Use(MetricHandle(stat.NewMetrics("test")))
 	}
-	if middlewareConfig.Gunzip {
-		r.Use(gzip.Gzip(gzip.DefaultCompression))
+	if middlewareConfig.BlackList {
+		r.Use(IpForbid())
+		r.Use(UserForbid())
 	}
+	r.Use(RequestId())
 }

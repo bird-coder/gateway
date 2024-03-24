@@ -2,7 +2,7 @@
  * @Author: yujiajie
  * @Date: 2024-03-18 10:39:13
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-18 14:58:17
+ * @LastEditTime: 2024-03-22 11:51:48
  * @FilePath: /gateway/options/rest.go
  * @Description:
  */
@@ -11,15 +11,15 @@ package options
 import "time"
 
 type MiddlewaresConf struct {
-	Auth       bool `json:",default=true"`
 	Trace      bool `json:",default=true"`
 	Log        bool `json:",default=true"`
 	Prometheus bool `json:",default=true"`
 	Breaker    bool `json:",default=true"`
-	Shedding   bool `json:",default=true"`
 	Recover    bool `json:",default=true"`
 	Metrics    bool `json:",default=true"`
 	Gunzip     bool `json:",default=true"`
+	BlackList  bool `json:",default=true"`
+	Sign       bool `json:",default=true"`
 }
 
 type PrivateKeyConf struct {

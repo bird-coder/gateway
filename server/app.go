@@ -2,7 +2,7 @@
  * @Author: yujiajie
  * @Date: 2024-03-18 11:04:02
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-18 11:27:00
+ * @LastEditTime: 2024-03-21 14:26:58
  * @FilePath: /gateway/server/app.go
  * @Description:
  */

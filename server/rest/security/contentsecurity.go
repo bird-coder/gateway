@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-12-10 19:50:59
- * @LastEditTime: 2023-12-12 23:25:58
+ * @LastEditTime: 2024-03-19 11:22:41
  * @LastEditors: yujiajie
  */
 package security
@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"gateway/core/codec"
 	"gateway/core/iox"
+	zlog "gateway/core/logger"
 	"gateway/server/rest/header"
 	"io"
 	"net/url"
@@ -117,7 +118,7 @@ func VerifySignature(ctx *gin.Context, securityHeader *ContentSecurityHeader, to
 		return header.CodeSignaturePass
 	}
 
-	fmt.Sprintf("signature different, expect: %s, actual: %s",
+	zlog.Info("signature different, expect: %s, actual: %s",
 		securityHeader.Signature, actualSignature)
 
 	return header.CodeSignatureInvalidToken

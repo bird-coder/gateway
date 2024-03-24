@@ -11,18 +11,18 @@ gateway:
     timeout: 30
     maxBytes: 1048576
     middlewares:
-      auth: false
       trace: false
       log: true
-      prometheus: false
-      breaker: false
-      shedding: false
+      prometheus: true
+      breaker: true
       recover: true
       metrics: false
       gunzip: false
+      blackList: true
+      sign: true
 logger:
   logLevel: debug
-  logPath: "../error/error.log"
+  logPath: "./logs/error/error.log"
   maxSize: 128
   maxAge: 7
   maxBackups: 30
@@ -30,3 +30,14 @@ logger:
 auth:
   secret: "B63F477D-BBA3-4E52-96D3-C0034C27694A"
   prevSecret: ""
+cache:
+  redis:
+    addr: 192.168.2.118:6379
+    password: Baison789321
+    db: 0
+    protocol: 3
+    dialTimeout: 30
+    readTimeOut: 300
+    writeTimeOut: 300
+    poolSize: 16
+    idleConns: 8

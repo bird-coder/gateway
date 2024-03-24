@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-19 19:26:34
- * @LastEditTime: 2024-03-18 16:06:33
+ * @LastEditTime: 2024-03-22 17:44:25
  * @LastEditors: yujiajie
  */
 package gateway
@@ -11,6 +11,7 @@ import (
 	"gateway/options"
 	"gateway/server/proxy"
 	"gateway/server/rest"
+	"gateway/server/rest/middleware"
 	"net/http/httputil"
 
 	"github.com/gin-gonic/gin"
@@ -50,11 +51,15 @@ func (s *Server) Stop() error {
 }
 
 func (s *Server) build() error {
+	// authHandle := middleware.Authorize(options.App.Auth.Secret, middleware.WithPrevSecret(options.App.Auth.PrevSecret))
+	// signHandle := middleware.ContentSecurityHandler(nil, time.Second*10, true)
 	for _, p := range s.proxys {
 		pro := proxy.NewServer(p)
 		s.Server.AddRoute(rest.Route{
-			Path:    p.Name + "/*" + pathName,
-			Handler: s.buildHandler(pro),
+			Group:      p.Name,
+			Path:       "/*" + pathName,
+			Handler:    s.buildHandler(pro),
+			Middleware: []gin.HandlerFunc{middleware.ErrorBreakerHandler(p.Name), middleware.FlowHandler(p.Name, 1)},
 		})
 	}
 	return nil
