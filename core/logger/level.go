@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-12-11 22:33:26
- * @LastEditTime: 2023-12-25 23:16:29
+ * @LastEditTime: 2024-03-25 15:16:28
  * @LastEditors: yujiajie
  */
 package logger
@@ -20,29 +20,29 @@ const (
 )
 
 func Info(format string, args ...interface{}) {
-	logger.Log(InfoLevel, format, args...)
+	DefaultLogger.Log(InfoLevel, format, args...)
 }
 
 func Debug(format string, args ...interface{}) {
-	logger.Log(DebugLevel, format, args...)
+	DefaultLogger.Log(DebugLevel, format, args...)
 }
 
 func Warn(format string, args ...interface{}) {
-	logger.Log(WarnLevel, format, args...)
+	DefaultLogger.Log(WarnLevel, format, args...)
 }
 
 func Error(format string, args ...interface{}) {
-	logger.Log(ErrorLevel, format, args...)
+	DefaultLogger.Log(ErrorLevel, format, args...)
 }
 
 func Panic(format string, args ...interface{}) {
-	logger.Log(PanicLevel, format, args...)
+	DefaultLogger.Log(PanicLevel, format, args...)
 }
 
 func DPanic(format string, args ...interface{}) {
-	logger.Log(DPanicLevel, format, args...)
+	DefaultLogger.Log(DPanicLevel, format, args...)
 }
 
 func Fatal(format string, args ...interface{}) {
-	logger.Log(FatalLevel, format, args...)
+	DefaultLogger.Log(FatalLevel, format, args...)
 }

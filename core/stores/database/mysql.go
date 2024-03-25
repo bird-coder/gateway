@@ -2,7 +2,7 @@
  * @Author: yujiajie
  * @Date: 2024-03-22 14:47:30
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-22 14:52:27
+ * @LastEditTime: 2024-03-25 17:49:03
  * @FilePath: /gateway/core/stores/database/mysql.go
  * @Description:
  */
@@ -18,7 +18,7 @@ import (
 	"gorm.io/plugin/dbresolver"
 )
 
-func NewDB(c *options.MysqlConfig) error {
+func NewDB(c *options.MysqlConfig) (*gorm.DB, error) {
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DSN: c.Default,
 	}), &gorm.Config{
@@ -29,12 +29,12 @@ func NewDB(c *options.MysqlConfig) error {
 	})
 	if err != nil {
 		fmt.Println("mysql init failed")
-		return err
+		return nil, err
 	}
 	if c.Cluster {
 		initCluster(db, c)
 	}
-	return nil
+	return db, nil
 }
 
 func initCluster(db *gorm.DB, c *options.MysqlConfig) {

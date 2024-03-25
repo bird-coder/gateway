@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-12-07 23:37:45
- * @LastEditTime: 2024-03-22 14:03:55
+ * @LastEditTime: 2024-03-25 15:57:32
  * @LastEditors: yujiajie
  */
 package middleware
@@ -11,7 +11,7 @@ import (
 	"bytes"
 	"errors"
 	"gateway/core/codec"
-	zlog "gateway/core/logger"
+	"gateway/core/container"
 	"io"
 	"net/http"
 
@@ -104,9 +104,10 @@ func (w *cryptionResponseWriter) flush(key []byte) {
 		return
 	}
 
+	log := container.App.GetLogger("default")
 	if n, err := io.WriteString(w.ResponseWriter, content); err != nil {
-		zlog.Error("write response failed, error: %s", err)
+		log.Error("write response failed, error: %s", err)
 	} else if n < len(content) {
-		zlog.Error("actual bytes: %d, written bytes: %d", len(content), n)
+		log.Error("actual bytes: %d, written bytes: %d", len(content), n)
 	}
 }

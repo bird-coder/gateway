@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-12-11 23:58:04
- * @LastEditTime: 2024-03-18 14:40:29
+ * @LastEditTime: 2024-03-25 16:37:00
  * @LastEditors: yujiajie
  */
 package middleware
@@ -10,8 +10,8 @@ package middleware
 import (
 	"bytes"
 	"fmt"
+	"gateway/core/container"
 	"gateway/core/iox"
-	zlog "gateway/core/logger"
 	"gateway/core/timex"
 	"io"
 	"net/http"
@@ -50,14 +50,16 @@ func LogHandler() gin.HandlerFunc {
 
 func logDetail(ctx *gin.Context, response *detailLoggedResponseWriter, reqBody []byte, duration time.Duration) {
 	var buf bytes.Buffer
+	log := container.App.GetLogger("chain")
 
+	request_id := ctx.GetInt64("RequestId")
 	code := ctx.Writer.Status()
-	buf.WriteString(fmt.Sprintf("[HTTP] %s - %d - %s - %s\n=> %s\n",
-		ctx.Request.Method, code, ctx.Request.RemoteAddr, timex.ReprOfDuration(duration), dumpRequest(ctx.Request)))
+	buf.WriteString(fmt.Sprintf("[HTTP] %s - %d - %s - %s - %d\n=> %s\n",
+		ctx.Request.Method, code, ctx.Request.RemoteAddr, timex.ReprOfDuration(duration), request_id, dumpRequest(ctx.Request)))
 
 	if duration > defaultSlowThreshold {
-		zlog.Info(fmt.Sprintf("[HTTP] %s - %d - %s - slowcall(%s)\n=> %s\n", ctx.Request.Method, code, ctx.Request.RemoteAddr,
-			timex.ReprOfDuration(duration), dumpRequest(ctx.Request)))
+		log.Info(fmt.Sprintf("[HTTP] %s - %d - %s - slowcall(%s) - %d\n=> %s\n", ctx.Request.Method, code, ctx.Request.RemoteAddr,
+			timex.ReprOfDuration(duration), request_id, dumpRequest(ctx.Request)))
 	}
 
 	if len(reqBody) > 0 {
@@ -70,9 +72,9 @@ func logDetail(ctx *gin.Context, response *detailLoggedResponseWriter, reqBody [
 	}
 
 	if ctx.Writer.Status() < http.StatusInternalServerError {
-		zlog.Info(buf.String())
+		log.Info(buf.String())
 	} else {
-		zlog.Error(buf.String())
+		log.Error(buf.String())
 	}
 }
 

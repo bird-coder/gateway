@@ -2,17 +2,18 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-14 00:08:06
- * @LastEditTime: 2024-03-18 11:33:13
+ * @LastEditTime: 2024-03-25 17:42:47
  * @LastEditors: yujiajie
  */
 package api
 
 import (
 	"fmt"
-	"gateway/core/constant"
-	zlog "gateway/core/logger"
+	"gateway/core/container"
+	"gateway/core/initialize"
 	"gateway/options"
 	"gateway/server"
+	"gateway/service/mod"
 
 	"github.com/spf13/cobra"
 )
@@ -38,17 +39,26 @@ func init() {
 }
 
 func setup() {
-	if err := options.App.LoadConfig(configYml); err != nil {
+	appConfig := new(options.AppConfig)
+	if err := appConfig.LoadConfig(configYml); err != nil {
 		panic(err)
 	}
-	fmt.Println(options.App.Gateway, options.App.Logger)
+	container.App.SetConfig("gateway", appConfig.Gateway)
+	container.App.SetConfig("auth", appConfig.Auth)
+	container.App.SetConfig("loggers", appConfig.Loggers)
+	container.App.SetConfig("cache", appConfig.Cache)
+	container.App.SetConfig("databases", appConfig.Databases)
+	initialize.SetupDB()
+	initialize.SetupCache()
+	initialize.SetupLog()
+	mod.Sync()
 	fmt.Println("starting api server...")
 }
 
 func run() error {
-	zlog.NewLogger(options.App.Logger, constant.Dev.String())
-	defer zlog.Sync()
-	zlog.Info("forager server start")
+	defer container.App.SyncLogger()
+	log := container.App.GetLogger("default")
+	log.Info("gateway server start")
 
 	server.Init()
 

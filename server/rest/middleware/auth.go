@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-12-06 00:01:57
- * @LastEditTime: 2024-03-22 09:49:32
+ * @LastEditTime: 2024-03-25 15:57:16
  * @LastEditors: yujiajie
  */
 package middleware
@@ -13,7 +13,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 
-	zlog "gateway/core/logger"
+	"gateway/core/container"
 
 	"github.com/gin-gonic/gin"
 )
@@ -73,10 +73,11 @@ func WithPrevSecret(secret string) AuthorizeOption {
 
 func unauthorized(ctx *gin.Context, err error) {
 	details, _ := httputil.DumpRequest(ctx.Request, true)
+	log := container.App.GetLogger("default")
 	if err != nil {
-		zlog.Error("authorize failed: %s\n=> %+v", err.Error(), string(details))
+		log.Error("authorize failed: %s\n=> %+v", err.Error(), string(details))
 	} else {
-		zlog.Error("authorize failed: %s\n=> %+v", noDetailReason, string(details))
+		log.Error("authorize failed: %s\n=> %+v", noDetailReason, string(details))
 	}
 	ctx.AbortWithStatus(http.StatusUnauthorized)
 }

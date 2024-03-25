@@ -2,7 +2,7 @@
  * @Author: yujiajie
  * @Date: 2024-03-18 11:04:02
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-21 14:26:58
+ * @LastEditTime: 2024-03-25 15:36:40
  * @FilePath: /gateway/server/app.go
  * @Description:
  */
@@ -11,9 +11,11 @@ package server
 import (
 	"context"
 	"fmt"
+	"gateway/core/container"
 	"gateway/core/rungroup"
 	"gateway/options"
 	"gateway/server/gateway"
+	"gateway/service/mod"
 	"os"
 	"os/signal"
 	"syscall"
@@ -49,7 +51,7 @@ func Init() error {
 	}
 	{
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		cfg := options.App.Gateway
+		cfg := container.App.GetConfig("gateway").(*options.GatewayConf)
 		server := gateway.NewServer(*cfg)
 		server.Server.WithContext(ctx)
 		g.Add(
@@ -62,6 +64,29 @@ func Init() error {
 				cancel()
 			},
 		)
+	}
+	{
+		gateConfig := container.App.GetConfig("gateway").(*options.GatewayConf)
+		middleConfig := gateConfig.RestConf.Middlewares
+		if middleConfig.Sign {
+			ticker := time.NewTicker(time.Minute * 5)
+			closeChan := make(chan struct{})
+			g.Add(
+				func() error {
+					for {
+						select {
+						case <-ticker.C:
+							mod.Sync()
+						case <-closeChan:
+							return nil
+						}
+					}
+				},
+				func(err error) {
+					close(closeChan)
+				},
+			)
+		}
 	}
 	if err := g.Run(); err != nil {
 		fmt.Println(err)

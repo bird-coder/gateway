@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"gateway/core/auth"
+	"gateway/core/container"
 	"gateway/options"
 	"io"
 	"net/http"
@@ -28,7 +29,8 @@ func LoginHandler() gin.HandlerFunc {
 			return
 		}
 
-		tk, err := auth.Issue(data, []byte(options.App.Auth.Secret))
+		authConfig := container.App.GetConfig("auth").(options.AuthConfig)
+		tk, err := auth.Issue(data, []byte(authConfig.Secret))
 		if err != nil {
 			ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
 				"msg":  "login failed",

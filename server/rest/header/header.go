@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-12-10 21:08:41
- * @LastEditTime: 2024-03-22 18:10:16
+ * @LastEditTime: 2024-03-25 10:52:18
  * @LastEditors: yujiajie
  */
 package header
@@ -44,6 +44,8 @@ const (
 	CryptionType     = 1
 	GzipEncoding     = "gzip"
 	AppIdField       = "appid"
+	NonceField       = "nonce"
+	ContentSignature = "X-Content-Signature"
 )
 
 const (

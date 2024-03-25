@@ -2,12 +2,13 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-26 17:55:56
- * @LastEditTime: 2024-03-22 11:49:38
+ * @LastEditTime: 2024-03-25 17:12:02
  * @LastEditors: yujiajie
  */
 package middleware
 
 import (
+	"gateway/core/container"
 	"gateway/core/stat"
 	"gateway/core/trace"
 	"gateway/options"
@@ -20,7 +21,8 @@ import (
 )
 
 func Init(r *gin.Engine) {
-	middlewareConfig := options.App.Gateway.RestConf.Middlewares
+	gatewayConfig := container.App.GetConfig("gateway").(*options.GatewayConf)
+	middlewareConfig := gatewayConfig.RestConf.Middlewares
 	r.Use(NoCache)
 	r.Use(Options)
 	r.Use(Secure)
@@ -50,4 +52,7 @@ func Init(r *gin.Engine) {
 		r.Use(UserForbid())
 	}
 	r.Use(RequestId())
+	if middlewareConfig.Filter {
+		r.Use(FilterHandler())
+	}
 }

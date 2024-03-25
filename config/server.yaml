@@ -15,18 +15,29 @@ gateway:
       log: true
       prometheus: true
       breaker: true
+      flow: true
       recover: true
       metrics: false
       gunzip: false
       blackList: true
-      sign: true
-logger:
-  logLevel: debug
-  logPath: "./logs/error/error.log"
-  maxSize: 128
-  maxAge: 7
-  maxBackups: 30
-  compress: false
+      # sign: true
+      # auth: true
+      filter: true
+loggers:
+  "default":
+    logLevel: debug
+    logPath: "./logs/error/error.log"
+    maxSize: 128
+    maxAge: 7
+    maxBackups: 30
+    compress: false
+  "chain":
+    logLevel: debug
+    logPath: "./logs/chain/chain.log"
+    maxSize: 128
+    maxAge: 7
+    maxBackups: 30
+    compress: false
 auth:
   secret: "B63F477D-BBA3-4E52-96D3-C0034C27694A"
   prevSecret: ""
@@ -41,3 +52,16 @@ cache:
     writeTimeOut: 300
     poolSize: 16
     idleConns: 8
+databases:
+  "alimatch/modadmin":
+    driver: mysql
+    default: root:server123&*(@tcp(192.168.2.118:3306)/modadmin?charset=utf8&parseTime=True&loc=Local&timeout=1000ms
+    idleConns: 10 
+    openConns: 15
+    idleTimeout: 300
+    aliveTimeout: 300
+    cluster: false
+    sources:
+      - root:server123&*(@tcp(192.168.2.118:3306)/modadmin?charset=utf8&parseTime=True&loc=Local&timeout=1000ms
+    replicas:
+      - root:server123&*(@tcp(192.168.2.118:3306)/modadmin?charset=utf8&parseTime=True&loc=Local&timeout=1000ms

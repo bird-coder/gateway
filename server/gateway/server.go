@@ -2,12 +2,13 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-19 19:26:34
- * @LastEditTime: 2024-03-22 17:44:25
+ * @LastEditTime: 2024-03-25 14:33:18
  * @LastEditors: yujiajie
  */
 package gateway
 
 import (
+	"gateway/core/container"
 	"gateway/options"
 	"gateway/server/proxy"
 	"gateway/server/rest"
@@ -51,15 +52,32 @@ func (s *Server) Stop() error {
 }
 
 func (s *Server) build() error {
-	// authHandle := middleware.Authorize(options.App.Auth.Secret, middleware.WithPrevSecret(options.App.Auth.PrevSecret))
-	// signHandle := middleware.ContentSecurityHandler(nil, time.Second*10, true)
+	var commonMiddle []gin.HandlerFunc
+	gatewayConfig := container.App.GetConfig("gateway").(*options.GatewayConf)
+	middlewareConfig := gatewayConfig.RestConf.Middlewares
+	if middlewareConfig.Auth {
+		authConfig := container.App.GetConfig("auth").(*options.AuthConfig)
+		authHandle := middleware.Authorize(authConfig.Secret, middleware.WithPrevSecret(authConfig.PrevSecret))
+		commonMiddle = append(commonMiddle, authHandle)
+	}
+	if middlewareConfig.Sign {
+		signHandle := middleware.SignHandler()
+		commonMiddle = append(commonMiddle, signHandle)
+	}
 	for _, p := range s.proxys {
 		pro := proxy.NewServer(p)
+		middles := append([]gin.HandlerFunc{}, commonMiddle...)
+		if middlewareConfig.Breaker {
+			middles = append(middles, middleware.ErrorBreakerHandler(p.Name))
+		}
+		if middlewareConfig.Flow {
+			middles = append(middles, middleware.FlowHandler(p.Name, 1))
+		}
 		s.Server.AddRoute(rest.Route{
 			Group:      p.Name,
 			Path:       "/*" + pathName,
 			Handler:    s.buildHandler(pro),
-			Middleware: []gin.HandlerFunc{middleware.ErrorBreakerHandler(p.Name), middleware.FlowHandler(p.Name, 1)},
+			Middleware: middles,
 		})
 	}
 	return nil

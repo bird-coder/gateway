@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	logger Logger
+	DefaultLogger Logger
 )
 
 type zaplog struct {
@@ -36,7 +36,6 @@ func NewLogger(cfg *options.LoggerConfig, env string) Logger {
 		zap.AddCallerSkip(1), zap.AddStacktrace(zap.WarnLevel))
 
 	zl := New(writer, level, zapOptions...)
-	logger = zl
 	return zl
 }
 
@@ -107,6 +106,35 @@ func (zl *zaplog) Log(level Level, format string, args ...interface{}) {
 	case FatalLevel:
 		zl.zap.Fatal(msg)
 	}
+}
+
+func (zl *zaplog) Info(format string, args ...interface{}) {
+	msg := fmt.Sprintf(format, args...)
+	zl.zap.Info(msg)
+}
+func (zl *zaplog) Warn(format string, args ...interface{}) {
+	msg := fmt.Sprintf(format, args...)
+	zl.zap.Warn(msg)
+}
+func (zl *zaplog) Debug(format string, args ...interface{}) {
+	msg := fmt.Sprintf(format, args...)
+	zl.zap.Debug(msg)
+}
+func (zl *zaplog) Error(format string, args ...interface{}) {
+	msg := fmt.Sprintf(format, args...)
+	zl.zap.Error(msg)
+}
+func (zl *zaplog) Panic(format string, args ...interface{}) {
+	msg := fmt.Sprintf(format, args...)
+	zl.zap.Panic(msg)
+}
+func (zl *zaplog) DPanic(format string, args ...interface{}) {
+	msg := fmt.Sprintf(format, args...)
+	zl.zap.DPanic(msg)
+}
+func (zl *zaplog) Fatal(format string, args ...interface{}) {
+	msg := fmt.Sprintf(format, args...)
+	zl.zap.Fatal(msg)
 }
 
 func (zl *zaplog) Sync() error {

@@ -2,7 +2,7 @@
  * @Author: yujiajie
  * @Date: 2024-03-22 16:10:37
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-22 16:23:10
+ * @LastEditTime: 2024-03-25 17:49:59
  * @FilePath: /gateway/core/container/container.go
  * @Description:
  */
@@ -85,4 +85,12 @@ func (k *Kernel) GetLogger(key string) logger.Logger {
 	k.mu.RLock()
 	defer k.mu.RUnlock()
 	return k.logs[key]
+}
+
+func (k *Kernel) SyncLogger() {
+	k.mu.Lock()
+	defer k.mu.Unlock()
+	for _, log := range k.logs {
+		log.Sync()
+	}
 }
