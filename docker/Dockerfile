@@ -12,7 +12,7 @@ WORKDIR /app
 ENV GOPROXY=https://goproxy.cn/,direct GO111MODULE=on
 
 COPY ./go.mod ./
-COPY ./go.sum ./
+# COPY ./go.sum ./
 
 RUN go mod tidy
 
@@ -22,6 +22,13 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o gateway ./
 
 FROM alpine
 
+WORKDIR /app
+
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs
-COPY --from=build /app/gateway /bin/gateway
-RUN chmod +x /bin/deploy-revert
+COPY --from=build /app/gateway /app/gateway
+COPY --from=build /app/config /app/config
+RUN chmod +x /app/gateway
+
+EXPOSE 8081
+
+CMD ["/app/gateway", "server"]

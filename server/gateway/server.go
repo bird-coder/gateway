@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-19 19:26:34
- * @LastEditTime: 2024-03-25 14:33:18
+ * @LastEditTime: 2024-03-26 14:08:56
  * @LastEditors: yujiajie
  */
 package gateway
@@ -52,18 +52,9 @@ func (s *Server) Stop() error {
 }
 
 func (s *Server) build() error {
-	var commonMiddle []gin.HandlerFunc
+	commonMiddle := middleware.Common()
 	gatewayConfig := container.App.GetConfig("gateway").(*options.GatewayConf)
 	middlewareConfig := gatewayConfig.RestConf.Middlewares
-	if middlewareConfig.Auth {
-		authConfig := container.App.GetConfig("auth").(*options.AuthConfig)
-		authHandle := middleware.Authorize(authConfig.Secret, middleware.WithPrevSecret(authConfig.PrevSecret))
-		commonMiddle = append(commonMiddle, authHandle)
-	}
-	if middlewareConfig.Sign {
-		signHandle := middleware.SignHandler()
-		commonMiddle = append(commonMiddle, signHandle)
-	}
 	for _, p := range s.proxys {
 		pro := proxy.NewServer(p)
 		middles := append([]gin.HandlerFunc{}, commonMiddle...)
@@ -71,7 +62,7 @@ func (s *Server) build() error {
 			middles = append(middles, middleware.ErrorBreakerHandler(p.Name))
 		}
 		if middlewareConfig.Flow {
-			middles = append(middles, middleware.FlowHandler(p.Name, 1))
+			middles = append(middles, middleware.FlowHandler(p.Name, p.Threshold))
 		}
 		s.Server.AddRoute(rest.Route{
 			Group:      p.Name,

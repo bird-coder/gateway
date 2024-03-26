@@ -3,11 +3,13 @@ gateway:
     - name: "modadmin"
       endpoints:
         - "http://192.168.2.118:8201"
+      threshold: 20
     - name: "tvadmin"
       endpoints:
         - "http://192.168.2.118:99"
+      threshold: 20
   restConf:
-    addr: "127.0.0.1:8081"
+    addr: ":8081"
     timeout: 30
     maxBytes: 1048576
     middlewares:

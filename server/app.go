@@ -2,7 +2,7 @@
  * @Author: yujiajie
  * @Date: 2024-03-18 11:04:02
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-25 15:36:40
+ * @LastEditTime: 2024-03-26 14:10:39
  * @FilePath: /gateway/server/app.go
  * @Description:
  */
@@ -18,6 +18,7 @@ import (
 	"gateway/service/mod"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 )
@@ -27,7 +28,7 @@ func Init() error {
 	{
 		term := make(chan os.Signal, 1)
 		signal.Notify(term, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)
-		ticker := time.NewTicker(time.Second * 60)
+		ticker := time.NewTicker(time.Second * 10)
 		closeChan := make(chan struct{})
 
 		g.Add(
@@ -40,7 +41,7 @@ func Init() error {
 					case <-closeChan:
 						return nil
 					case <-ticker.C:
-						fmt.Println("running...")
+						printStats()
 					}
 				}
 			},
@@ -66,6 +67,7 @@ func Init() error {
 		)
 	}
 	{
+		//每5分钟同步应用权限配置
 		gateConfig := container.App.GetConfig("gateway").(*options.GatewayConf)
 		middleConfig := gateConfig.RestConf.Middlewares
 		if middleConfig.Sign {
@@ -92,4 +94,12 @@ func Init() error {
 		fmt.Println(err)
 	}
 	return nil
+}
+
+func printStats() {
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+
+	fmt.Printf("Alloc = %v\tTotalAlloc = %v\tHeapAlloc = %v\tSys = %v\tNumGc = %v\n",
+		m.Alloc, m.TotalAlloc, m.HeapAlloc, m.Sys, m.NumGC)
 }

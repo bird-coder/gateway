@@ -1,4 +1,4 @@
 /vendor
 go.sum
-/gateway
 /logs
+/gateway

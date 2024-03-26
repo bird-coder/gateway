@@ -3,7 +3,7 @@
  # @Author: yujiajie
  # @Date: 2024-03-25 16:18:27
  # @LastEditors: yujiajie
- # @LastEditTime: 2024-03-25 16:24:59
+ # @LastEditTime: 2024-03-26 14:08:00
  # @FilePath: /gateway/docker/metric/down.sh
  # @Description: 
 ### 
@@ -11,7 +11,7 @@
 docker stop prometheus
 docker rm prometheus
 
-docker build -f prometheus/Dockerfile -t prometheus .
+docker build -f docker/metric/prometheus/Dockerfile -t prometheus .
 
 docker run -it --name prometheus \
 -p 9090:9090 \
@@ -27,7 +27,7 @@ docker run -it --name prometheus \
 docker stop grafana
 docker rm grafana
 
-docker build -f grafana/Dockerfile -t grafana .
+docker build -f docker/metric/grafana/Dockerfile -t grafana .
 
 docker run -it --name grafana \
 -p 3011:3000 \

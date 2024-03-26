@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-26 17:55:56
- * @LastEditTime: 2024-03-25 17:12:02
+ * @LastEditTime: 2024-03-26 14:09:09
  * @LastEditors: yujiajie
  */
 package middleware
@@ -21,38 +21,53 @@ import (
 )
 
 func Init(r *gin.Engine) {
-	gatewayConfig := container.App.GetConfig("gateway").(*options.GatewayConf)
-	middlewareConfig := gatewayConfig.RestConf.Middlewares
 	r.Use(NoCache)
 	r.Use(Options)
 	r.Use(Secure)
+	api.InitWithConfigFile("config/sentinel.yaml")
+}
+
+func Common() []gin.HandlerFunc {
+	var commonMiddle []gin.HandlerFunc
+	gatewayConfig := container.App.GetConfig("gateway").(*options.GatewayConf)
+	middlewareConfig := gatewayConfig.RestConf.Middlewares
+
 	if middlewareConfig.Gunzip {
-		r.Use(gzip.Gzip(gzip.DefaultCompression))
+		commonMiddle = append(commonMiddle, gzip.Gzip(gzip.DefaultCompression))
 	}
 	if middlewareConfig.Recover {
-		r.Use(RecoverHandler())
+		commonMiddle = append(commonMiddle, RecoverHandler())
 	}
 	if middlewareConfig.Trace {
 		trace.NewOsExporter(trace.DefaultService)
-		r.Use(otelgin.Middleware(trace.DefaultService))
+		commonMiddle = append(commonMiddle, otelgin.Middleware(trace.DefaultService))
 	}
 	if middlewareConfig.Log {
-		r.Use(LogHandler())
+		commonMiddle = append(commonMiddle, LogHandler())
 	}
 	if middlewareConfig.Prometheus {
-		r.Use(PrometheusHandler())
+		commonMiddle = append(commonMiddle, PrometheusHandler())
 	}
-	api.InitWithConfigFile("config/sentinel.yaml")
-	r.Use(Sentinel())
+	commonMiddle = append(commonMiddle, Sentinel())
 	if middlewareConfig.Metrics {
-		r.Use(MetricHandle(stat.NewMetrics("test")))
+		commonMiddle = append(commonMiddle, MetricHandle(stat.NewMetrics("test")))
 	}
 	if middlewareConfig.BlackList {
-		r.Use(IpForbid())
-		r.Use(UserForbid())
+		commonMiddle = append(commonMiddle, IpForbid())
+		commonMiddle = append(commonMiddle, UserForbid())
 	}
-	r.Use(RequestId())
+	commonMiddle = append(commonMiddle, RequestId())
 	if middlewareConfig.Filter {
-		r.Use(FilterHandler())
+		commonMiddle = append(commonMiddle, FilterHandler())
 	}
+	if middlewareConfig.Auth {
+		authConfig := container.App.GetConfig("auth").(*options.AuthConfig)
+		authHandle := Authorize(authConfig.Secret, WithPrevSecret(authConfig.PrevSecret))
+		commonMiddle = append(commonMiddle, authHandle)
+	}
+	if middlewareConfig.Sign {
+		commonMiddle = append(commonMiddle, SignHandler())
+	}
+
+	return commonMiddle
 }

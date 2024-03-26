@@ -2,7 +2,7 @@
  * @Author: yujiajie
  * @Date: 2024-03-18 09:21:33
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-18 15:56:40
+ * @LastEditTime: 2024-03-26 14:09:46
  * @FilePath: /gateway/options/gateway.go
  * @Description:
  */
@@ -38,4 +38,5 @@ type Proxy struct {
 	EndPoints []string
 	Current   int
 	Mappings  []ProxyMapping
+	Threshold int
 }

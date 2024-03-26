@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-12-05 21:46:52
- * @LastEditTime: 2023-12-05 22:03:16
+ * @LastEditTime: 2024-03-26 14:06:30
  * @LastEditors: yujiajie
  */
 package metric
@@ -31,6 +31,7 @@ type promCounterVec struct {
 	counter *prom.CounterVec
 }
 
+// 创建prometheus统计指标
 func NewCounterVec(cfg *CounterVecOpts) CounterVec {
 	if cfg == nil {
 		return nil

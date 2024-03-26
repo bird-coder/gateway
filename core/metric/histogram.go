@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-30 00:01:59
- * @LastEditTime: 2023-12-05 22:15:43
+ * @LastEditTime: 2024-03-26 14:06:39
  * @LastEditors: yujiajie
  */
 package metric
@@ -29,6 +29,7 @@ type promHistogramVec struct {
 	histogram *prom.HistogramVec
 }
 
+// 创建prometheus统计指标
 func NewHistogramVec(cfg *HistogramVecOpts) HistogramVec {
 	if cfg == nil {
 		return nil

@@ -2,7 +2,7 @@
  * @Author: yujiajie
  * @Date: 2024-03-20 09:31:16
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-21 09:21:28
+ * @LastEditTime: 2024-03-26 14:07:27
  * @FilePath: /gateway/core/trace/exporter.go
  * @Description:
  */
@@ -24,6 +24,7 @@ import (
 
 const DefaultService = "my-server"
 
+// prometheus收集指标
 func NewPromExporter(service string) error {
 	exporter, err := prometheus.New()
 	if err != nil {
@@ -45,6 +46,7 @@ func NewPromExporter(service string) error {
 	return nil
 }
 
+// jaeger收集指标
 func NewJaegerExporter(service string, endpoint string) error {
 	exporter, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(endpoint)))
 	if err != nil {
@@ -59,6 +61,7 @@ func NewJaegerExporter(service string, endpoint string) error {
 	return nil
 }
 
+// otlp收集指标
 func NewOtlpExporter(service string, endpoint string) error {
 	ctx := context.Background()
 	exporter, err := otlptracehttp.New(ctx, otlptracehttp.WithEndpoint(endpoint), otlptracehttp.WithInsecure())
@@ -77,6 +80,7 @@ func NewOtlpExporter(service string, endpoint string) error {
 	return nil
 }
 
+// 控制台收集指标
 func NewOsExporter(service string) error {
 	exporter, err := stdouttrace.New(stdouttrace.WithPrettyPrint())
 	if err != nil {
