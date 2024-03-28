@@ -1,0 +1,71 @@
+gateway:
+  proxys:
+    - name: "xxxx"
+      endpoints:
+        - "http://127.0.0.1:8201"
+      threshold: 200
+    - name: "xxxx"
+      endpoints:
+        - "http://127.0.0.1:99"
+      threshold: 200
+  restConf:
+    addr: ":8081"
+    timeout: 30
+    maxBytes: 1048576
+    middlewares:
+      trace: false
+      log: true
+      prometheus: true
+      breaker: true
+      flow: true
+      recover: true
+      metrics: false
+      gunzip: false
+      blackList: true
+      # sign: true
+      # auth: true
+      filter: true
+loggers:
+  "default":
+    logLevel: info
+    logPath: "./logs/error/error.log"
+    maxSize: 128
+    maxAge: 7
+    maxBackups: 30
+    compress: false
+  "chain":
+    logLevel: info
+    logPath: "./logs/chain/chain.log"
+    maxSize: 128
+    maxAge: 7
+    maxBackups: 30
+    compress: false
+auth:
+  secret: "xxxxxxxxxxxxx"
+  prevSecret: ""
+cache:
+  redis:
+    addr: 127.0.0.1:6379
+    password: xxxxxx
+    db: 0
+    protocol: 3
+    dialTimeout: 30
+    readTimeOut: 300
+    writeTimeOut: 300
+    poolSize: 16
+    idleConns: 8
+databases:
+  "xxxxx":
+    driver: mysql
+    default: root:xxx@tcp(127.0.0.1:3306)/xxxx?charset=utf8&parseTime=True&loc=Local&timeout=1000ms
+    idleConns: 10 
+    openConns: 15
+    idleTimeout: 300
+    aliveTimeout: 300
+    cluster: false
+    sources:
+      - root:xxx@tcp(127.0.0.1:3306)/xxxx?charset=utf8&parseTime=True&loc=Local&timeout=1000ms
+    replicas:
+      - root:xxx@tcp(127.0.0.1:3306)/xxxx?charset=utf8&parseTime=True&loc=Local&timeout=1000ms
+environment: "production"
+# 系统环境, 可选值: development, production
