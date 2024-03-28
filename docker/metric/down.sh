@@ -31,7 +31,7 @@ docker build -f docker/metric/grafana/Dockerfile -t grafana .
 docker run -it --name grafana \
 -p 3011:3000 \
 -v /usr/local/www/Gateway/docker/metric/grafana:/var/lib/grafana \
--e "GF_SECURITY_ADMIN_PASSWORD=Baison789321" \
+-e "GF_SECURITY_ADMIN_PASSWORD=123456" \
 -e "GF_USERS_ALLOW_SIGN_UP=false" \
 --log-opt max-size=10m --log-opt max-file=3 \
 --restart always \
