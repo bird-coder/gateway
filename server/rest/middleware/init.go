@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-26 17:55:56
- * @LastEditTime: 2024-03-26 14:09:09
+ * @LastEditTime: 2024-03-28 16:01:14
  * @LastEditors: yujiajie
  */
 package middleware
@@ -21,7 +21,7 @@ import (
 )
 
 func Init(r *gin.Engine) {
-	r.Use(NoCache)
+	// r.Use(NoCache)
 	r.Use(Options)
 	r.Use(Secure)
 	api.InitWithConfigFile("config/sentinel.yaml")
@@ -32,6 +32,7 @@ func Common() []gin.HandlerFunc {
 	gatewayConfig := container.App.GetConfig("gateway").(*options.GatewayConf)
 	middlewareConfig := gatewayConfig.RestConf.Middlewares
 
+	commonMiddle = append(commonMiddle, RequestId())
 	if middlewareConfig.Gunzip {
 		commonMiddle = append(commonMiddle, gzip.Gzip(gzip.DefaultCompression))
 	}
@@ -56,7 +57,6 @@ func Common() []gin.HandlerFunc {
 		commonMiddle = append(commonMiddle, IpForbid())
 		commonMiddle = append(commonMiddle, UserForbid())
 	}
-	commonMiddle = append(commonMiddle, RequestId())
 	if middlewareConfig.Filter {
 		commonMiddle = append(commonMiddle, FilterHandler())
 	}

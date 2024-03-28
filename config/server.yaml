@@ -3,11 +3,11 @@ gateway:
     - name: "modadmin"
       endpoints:
         - "http://192.168.2.118:8201"
-      threshold: 20
+      threshold: 200
     - name: "tvadmin"
       endpoints:
         - "http://192.168.2.118:99"
-      threshold: 20
+      threshold: 200
   restConf:
     addr: ":8081"
     timeout: 30
@@ -27,14 +27,14 @@ gateway:
       filter: true
 loggers:
   "default":
-    logLevel: debug
+    logLevel: info
     logPath: "./logs/error/error.log"
     maxSize: 128
     maxAge: 7
     maxBackups: 30
     compress: false
   "chain":
-    logLevel: debug
+    logLevel: info
     logPath: "./logs/chain/chain.log"
     maxSize: 128
     maxAge: 7
@@ -67,3 +67,5 @@ databases:
       - root:server123&*(@tcp(192.168.2.118:3306)/modadmin?charset=utf8&parseTime=True&loc=Local&timeout=1000ms
     replicas:
       - root:server123&*(@tcp(192.168.2.118:3306)/modadmin?charset=utf8&parseTime=True&loc=Local&timeout=1000ms
+environment: "production"
+# 系统环境, 可选值: development, production

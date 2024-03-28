@@ -12,7 +12,7 @@ WORKDIR /app
 ENV GOPROXY=https://goproxy.cn/,direct GO111MODULE=on
 
 COPY ./go.mod ./
-# COPY ./go.sum ./
+COPY ./go.sum ./
 
 RUN go mod tidy
 

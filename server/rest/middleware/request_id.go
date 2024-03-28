@@ -2,8 +2,8 @@
  * @Author: yujiajie
  * @Date: 2024-03-22 11:31:45
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-22 11:49:08
- * @FilePath: /gateway/server/rest/middleware/request_id.go
+ * @LastEditTime: 2024-03-28 16:06:40
+ * @FilePath: /Gateway/server/rest/middleware/request_id.go
  * @Description:
  */
 package middleware
@@ -23,7 +23,7 @@ func RequestId() gin.HandlerFunc {
 			return
 		}
 		requestId := node.Generate()
-		ctx.Set("RequestId", requestId)
+		ctx.Set("RequestId", requestId.Int64())
 		ctx.Next()
 	}
 }

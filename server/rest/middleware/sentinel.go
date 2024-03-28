@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-26 17:42:29
- * @LastEditTime: 2024-03-22 11:02:47
+ * @LastEditTime: 2024-03-28 16:00:34
  * @LastEditors: yujiajie
  */
 package middleware
@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"runtime"
 
 	"github.com/alibaba/sentinel-golang/api"
 	"github.com/alibaba/sentinel-golang/core/base"
@@ -24,10 +25,11 @@ import (
 // 根据cpu使用率限制请求，自适应保护系统
 func Sentinel() gin.HandlerFunc {
 	resName := "gateway"
+	cores := runtime.NumCPU()
 	if _, err := system.LoadRules([]*system.Rule{
 		{
-			MetricType:   system.CpuUsage,
-			TriggerCount: 0.6,
+			MetricType:   system.Load,
+			TriggerCount: float64(cores) * 2.5,
 			Strategy:     system.BBR,
 		},
 	}); err != nil {
@@ -36,7 +38,7 @@ func Sentinel() gin.HandlerFunc {
 	return sentinel.SentinelMiddleware(
 		sentinel.WithBlockFallback(func(ctx *gin.Context) {
 			ctx.AbortWithStatusJSON(http.StatusOK, gin.H{
-				"msg":  "too many request; the quota used up!",
+				"msg":  "too high system load; the quota used up!",
 				"code": 500,
 			})
 		}),
@@ -48,14 +50,13 @@ func Sentinel() gin.HandlerFunc {
 
 // 流量控制
 func FlowHandler(resName string, threshold int) gin.HandlerFunc {
-	if _, err := flow.LoadRules([]*flow.Rule{
+	if _, err := flow.LoadRulesOfResource(resName, []*flow.Rule{
 		{
 			Resource:               resName,
 			TokenCalculateStrategy: flow.Direct,
-			ControlBehavior:        flow.Throttling,
+			ControlBehavior:        flow.Reject,
 			Threshold:              float64(threshold),
-			StatIntervalInMs:       100,
-			MaxQueueingTimeMs:      500,
+			StatIntervalInMs:       1000,
 		},
 	}); err != nil {
 		fmt.Println(err)
@@ -76,7 +77,7 @@ func FlowHandler(resName string, threshold int) gin.HandlerFunc {
 
 // 根据错误率熔断
 func ErrorBreakerHandler(resName string) gin.HandlerFunc {
-	if _, err := circuitbreaker.LoadRules([]*circuitbreaker.Rule{
+	if _, err := circuitbreaker.LoadRulesOfResource(resName, []*circuitbreaker.Rule{
 		{
 			Resource:         resName,
 			Strategy:         circuitbreaker.ErrorRatio,
@@ -106,7 +107,7 @@ func ErrorBreakerHandler(resName string) gin.HandlerFunc {
 		ctx.Next()
 
 		code := ctx.Writer.Status()
-		if code != 200 {
+		if code >= http.StatusBadRequest {
 			api.TraceError(entry, errors.New("service unavailable"))
 		}
 	}

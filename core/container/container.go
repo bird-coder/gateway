@@ -2,8 +2,8 @@
  * @Author: yujiajie
  * @Date: 2024-03-22 16:10:37
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-25 17:49:59
- * @FilePath: /gateway/core/container/container.go
+ * @LastEditTime: 2024-03-28 16:02:04
+ * @FilePath: /Gateway/core/container/container.go
  * @Description:
  */
 package container
@@ -23,6 +23,7 @@ type Kernel struct {
 	configs map[string]any
 	cache   cache.Cache
 	logs    map[string]logger.Logger
+	env     string
 
 	mu sync.RWMutex
 }
@@ -93,4 +94,16 @@ func (k *Kernel) SyncLogger() {
 	for _, log := range k.logs {
 		log.Sync()
 	}
+}
+
+func (k *Kernel) SetEnv(env string) {
+	k.mu.Lock()
+	defer k.mu.Unlock()
+	k.env = env
+}
+
+func (k *Kernel) GetEnv() string {
+	k.mu.Lock()
+	defer k.mu.Unlock()
+	return k.env
 }

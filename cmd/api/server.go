@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-14 00:08:06
- * @LastEditTime: 2024-03-25 17:42:47
+ * @LastEditTime: 2024-03-28 15:59:55
  * @LastEditors: yujiajie
  */
 package api
@@ -43,15 +43,22 @@ func setup() {
 	if err := appConfig.LoadConfig(configYml); err != nil {
 		panic(err)
 	}
+	container.App.SetEnv(appConfig.Environment)
 	container.App.SetConfig("gateway", appConfig.Gateway)
 	container.App.SetConfig("auth", appConfig.Auth)
 	container.App.SetConfig("loggers", appConfig.Loggers)
 	container.App.SetConfig("cache", appConfig.Cache)
 	container.App.SetConfig("databases", appConfig.Databases)
-	initialize.SetupDB()
-	initialize.SetupCache()
+	if err := initialize.SetupDB(); err != nil {
+		panic(err)
+	}
+	if err := initialize.SetupCache(); err != nil {
+		panic(err)
+	}
 	initialize.SetupLog()
-	mod.Sync()
+	if err := mod.Sync(); err != nil {
+		panic(err)
+	}
 	fmt.Println("starting api server...")
 }
 

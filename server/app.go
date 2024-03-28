@@ -2,8 +2,8 @@
  * @Author: yujiajie
  * @Date: 2024-03-18 11:04:02
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-26 14:10:39
- * @FilePath: /gateway/server/app.go
+ * @LastEditTime: 2024-03-28 16:07:52
+ * @FilePath: /Gateway/server/app.go
  * @Description:
  */
 package server
@@ -28,7 +28,7 @@ func Init() error {
 	{
 		term := make(chan os.Signal, 1)
 		signal.Notify(term, syscall.SIGHUP, syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT)
-		ticker := time.NewTicker(time.Second * 10)
+		ticker := time.NewTicker(time.Second * 60)
 		closeChan := make(chan struct{})
 
 		g.Add(

@@ -2,7 +2,7 @@ version: "v1"
 sentinel:
   app:
     name: sentinel-gateway
-    type: 0
+    type: 1
   log:
     dir: "./logs/csp"
     usePid: false

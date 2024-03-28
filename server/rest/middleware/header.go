@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-26 18:11:29
- * @LastEditTime: 2023-12-10 21:11:58
+ * @LastEditTime: 2024-03-28 16:06:12
  * @LastEditors: yujiajie
  */
 package middleware
@@ -28,10 +28,10 @@ func NoCache(c *gin.Context) {
 }
 
 func Options(c *gin.Context) {
+	checkAndSetHeader(c)
 	if c.Request.Method != http.MethodOptions {
 		c.Next()
 	} else {
-		checkAndSetHeader(c)
 		c.AbortWithStatus(http.StatusNoContent)
 	}
 }
@@ -90,7 +90,7 @@ func setHeader(c *gin.Context, origin string) {
 
 func setVaryHeaders(c *gin.Context) {
 	headers := make([]string, 0, 3)
-	headers[0] = header.OriginHeader
+	headers = append(headers, header.OriginHeader)
 	if c.Request.Method == http.MethodOptions {
 		headers = append(headers, header.RequestMethod, header.RequestHeaders)
 	}

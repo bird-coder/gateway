@@ -2,8 +2,8 @@
  * @Author: yujiajie
  * @Date: 2024-03-22 16:10:59
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-25 17:50:02
- * @FilePath: /gateway/core/container/type.go
+ * @LastEditTime: 2024-03-28 16:02:10
+ * @FilePath: /Gateway/core/container/type.go
  * @Description:
  */
 package container
@@ -28,4 +28,8 @@ type Container interface {
 
 	SetLogger(key string, log logger.Logger)
 	GetLogger(key string) logger.Logger
+	SyncLogger()
+
+	SetEnv(env string)
+	GetEnv() string
 }

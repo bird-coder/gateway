@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-19 19:26:34
- * @LastEditTime: 2024-03-26 14:08:56
+ * @LastEditTime: 2024-03-28 15:58:57
  * @LastEditors: yujiajie
  */
 package gateway
@@ -59,10 +59,10 @@ func (s *Server) build() error {
 		pro := proxy.NewServer(p)
 		middles := append([]gin.HandlerFunc{}, commonMiddle...)
 		if middlewareConfig.Breaker {
-			middles = append(middles, middleware.ErrorBreakerHandler(p.Name))
+			middles = append(middles, middleware.ErrorBreakerHandler(p.Name+"_breaker"))
 		}
 		if middlewareConfig.Flow {
-			middles = append(middles, middleware.FlowHandler(p.Name, p.Threshold))
+			middles = append(middles, middleware.FlowHandler(p.Name+"_flow", p.Threshold))
 		}
 		s.Server.AddRoute(rest.Route{
 			Group:      p.Name,

@@ -2,7 +2,7 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-19 20:28:11
- * @LastEditTime: 2024-03-22 10:47:19
+ * @LastEditTime: 2024-03-28 15:59:14
  * @LastEditors: yujiajie
  */
 package rest
@@ -10,6 +10,8 @@ package rest
 import (
 	"context"
 	"fmt"
+	"gateway/core/constant"
+	"gateway/core/container"
 	"gateway/options"
 	"gateway/server/rest/middleware"
 	"gateway/server/rest/router"
@@ -27,6 +29,9 @@ type Server struct {
 }
 
 func NewServer(c options.RestConf) *Server {
+	if container.App.GetEnv() == string(constant.Prod) {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	g := gin.New()
 	middleware.Init(g)
 	router.Init(g)

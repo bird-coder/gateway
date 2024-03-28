@@ -2,12 +2,14 @@
  * @Description:
  * @Author: yujiajie
  * @Date: 2023-11-26 17:36:46
- * @LastEditTime: 2024-03-26 14:10:17
+ * @LastEditTime: 2024-03-28 15:59:25
  * @LastEditors: yujiajie
  */
 package router
 
 import (
+	"gateway/core/constant"
+	"gateway/core/container"
 	"gateway/service"
 	"net/http/pprof"
 
@@ -22,7 +24,9 @@ func Init(r *gin.Engine) {
 	})
 	r.GET("/auth/login", service.Login)
 
-	handlePprof(r)
+	if container.App.GetEnv() == string(constant.Dev) {
+		handlePprof(r)
+	}
 }
 
 func handlePprof(r *gin.Engine) {

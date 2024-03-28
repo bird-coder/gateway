@@ -2,8 +2,8 @@
  * @Author: yujiajie
  * @Date: 2024-03-20 09:31:16
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-26 14:07:27
- * @FilePath: /gateway/core/trace/exporter.go
+ * @LastEditTime: 2024-03-28 16:03:22
+ * @FilePath: /Gateway/core/trace/exporter.go
  * @Description:
  */
 package trace

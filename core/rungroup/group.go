@@ -2,8 +2,8 @@
  * @Author: yujiajie
  * @Date: 2024-03-18 11:05:56
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-26 14:06:59
- * @FilePath: /gateway/core/rungroup/group.go
+ * @LastEditTime: 2024-03-28 16:03:09
+ * @FilePath: /Gateway/core/rungroup/group.go
  * @Description: 用于管理协程同步，优雅关闭
  */
 package rungroup

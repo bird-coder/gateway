@@ -2,8 +2,8 @@
  * @Author: yujiajie
  * @Date: 2024-03-18 15:35:38
  * @LastEditors: yujiajie
- * @LastEditTime: 2024-03-21 15:59:37
- * @FilePath: /gateway/server/proxy/server.go
+ * @LastEditTime: 2024-03-28 16:00:59
+ * @FilePath: /Gateway/server/proxy/server.go
  * @Description:
  */
 package proxy
@@ -15,12 +15,14 @@ import (
 	"gateway/options"
 	"gateway/server/rest/header"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -34,6 +36,7 @@ func NewServer(p options.Proxy) *httputil.ReverseProxy {
 	return &httputil.ReverseProxy{
 		Director:       director(p),
 		ModifyResponse: modifyResponse(),
+		Transport:      transport(),
 	}
 }
 
@@ -94,6 +97,22 @@ func modifyResponse() func(*http.Response) error {
 		}
 
 		return nil
+	}
+}
+
+func transport() *http.Transport {
+	return &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          300,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ResponseHeaderTimeout: 10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
 	}
 }
 
